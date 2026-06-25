@@ -121,7 +121,6 @@ export default function UploadPage({ onStudentsExtracted, showToast }) {
         id="image-file-input"
         type="file"
         accept="image/*"
-        capture="environment"
         style={{ display: 'none' }}
         onChange={handleInputChange}
       />

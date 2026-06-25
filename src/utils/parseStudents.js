@@ -22,8 +22,11 @@ export function parseStudents(rawText) {
     if (!line) continue;
 
     // Try to find a 10-digit Indian mobile number in the line
-    // Allow separators like spaces, dashes, dots before/after number
-    const phoneMatch = line.match(/\b([6-9]\d{9})\b/);
+    // Tesseract often adds spaces or dashes between digits.
+    // Let's find any sequence of 10 digits (ignoring spaces/dashes) starting with 6-9.
+    const normalizedLine = line.replace(/[-\s.]/g, ''); // strip spaces and dashes for checking
+    const phoneMatch = normalizedLine.match(/([6-9]\d{9})/);
+    
     if (!phoneMatch) continue; // Skip lines without a valid number
 
     const phone = phoneMatch[1];
@@ -32,9 +35,10 @@ export function parseStudents(rawText) {
     if (seenNumbers.has(phone)) continue;
     seenNumbers.add(phone);
 
-    // Extract name: remove the phone number (and common separators) from line
+    // Extract name: remove the found phone number (and common separators) from the ORIGINAL line
+    // Since the original line might have spaces in the phone, we just strip ALL digits to get the name
     let namePart = line
-      .replace(phoneMatch[0], '')  // Remove phone number
+      .replace(/\d/g, '')          // Remove all digits
       .replace(/[-–—|,.:;#*]/g, ' ') // Remove common separators
       .replace(/\s+/g, ' ')        // Collapse whitespace
       .trim();
